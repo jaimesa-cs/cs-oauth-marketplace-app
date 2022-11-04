@@ -1,5 +1,5 @@
 import { Button, FieldLabel, InstructionText } from "@contentstack/venus-components";
-import { IBulkPublishingConfig, TypeAppSdkConfigState } from "../types";
+import { IOAuthExampleConfig, TypeAppSdkConfigState } from "../types";
 import { showError, showSuccess } from "../utils/notifications";
 
 import CodeEditor from "@uiw/react-textarea-code-editor";
@@ -17,20 +17,19 @@ const isValidJson = (json: any) => {
   }
   return true;
 };
-const json: IBulkPublishingConfig = {
+const json: IOAuthExampleConfig = {
   name: "App Configuration New",
 };
 const AppConfigurationExtension = () => {
   const [sdk] = useAppSdk();
-  // const [config, setConfig] = React.useState<IBulkPublishingState>();
-  const [state, setState] = React.useState<TypeAppSdkConfigState & { bulkPublishingConfig: IBulkPublishingConfig }>({
+  const [state, setState] = React.useState<TypeAppSdkConfigState & { oAuthExampleConfig: IOAuthExampleConfig }>({
     installationData: {
       configuration: {},
       serverConfiguration: {},
     },
     setInstallationData: (): any => {},
     appSdkInitialized: false,
-    bulkPublishingConfig: json,
+    oAuthExampleConfig: json,
   });
 
   /** updateConfig - Function where you should update the state variable
@@ -39,10 +38,11 @@ const AppConfigurationExtension = () => {
   const updateConfig = React.useCallback(() => {
     setLoading(true);
     const updatedConfig = state?.installationData?.configuration || {};
-    updatedConfig.bulkPublishingConfig = state.bulkPublishingConfig;
-
+    delete updatedConfig.temp;
+    updatedConfig.oAuthExampleConfig = state.oAuthExampleConfig;
     const updatedServerConfig = state.installationData.serverConfiguration;
-    updatedServerConfig.bulkPublishingConfig = state.bulkPublishingConfig;
+    delete updatedServerConfig.temp;
+    updatedServerConfig.oAuthExampleConfig = state.oAuthExampleConfig;
 
     if (typeof state.setInstallationData !== "undefined") {
       state
@@ -77,7 +77,7 @@ const AppConfigurationExtension = () => {
             installationData: utils.mergeObjects(state.installationData, installationDataFromSDK),
             setInstallationData: setInstallationDataOfSDK,
             appSdkInitialized: true,
-            bulkPublishingConfig: installationDataFromSDK.configuration.bulkPublishingConfig,
+            oauthExampleConfig: installationDataFromSDK.configuration.oauthExampleConfig,
           };
         });
       });
@@ -110,7 +110,7 @@ const AppConfigurationExtension = () => {
               >
                 <CodeEditor
                   key="advancedPublishingConfig"
-                  value={state.appSdkInitialized ? JSON.stringify(state.bulkPublishingConfig, null, 2) : "Loading..."}
+                  value={state.appSdkInitialized ? JSON.stringify(state.oAuthExampleConfig, null, 2) : "Loading..."}
                   language="json"
                   placeholder="Please enter JSON content."
                   onChange={(e: any) => {
@@ -118,7 +118,7 @@ const AppConfigurationExtension = () => {
                     setIsValid(valid);
                     if (valid) {
                       setState((s) => {
-                        return { ...s, bulkPublishingConfig: JSON.parse(e.target.value) };
+                        return { ...s, oAuthExampleConfig: JSON.parse(e.target.value) };
                       });
                     }
                   }}

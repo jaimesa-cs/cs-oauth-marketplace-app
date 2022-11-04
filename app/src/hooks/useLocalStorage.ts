@@ -44,8 +44,12 @@ function useLocalStorage<T>(key: string, initialValue?: T): [T | undefined, SetV
       // Allow value to be a function so we have the same API as useState
       const newValue = value instanceof Function ? value(storedValue) : value;
 
-      // Save to local storage
-      window.localStorage.setItem(key, JSON.stringify(newValue));
+      if (newValue === undefined) {
+        window.localStorage.removeItem(key);
+      } else {
+        // Save to local storage
+        window.localStorage.setItem(key, JSON.stringify(newValue));
+      }
 
       // Save state
       setStoredValue(newValue);
@@ -67,7 +71,6 @@ function useLocalStorage<T>(key: string, initialValue?: T): [T | undefined, SetV
       if ((event as StorageEvent)?.key && (event as StorageEvent).key !== key) {
         return;
       }
-      console.log("🚀 ~ file: useLocalStorage.ts ~ line 70 ~ handleStorageChange");
       setStoredValue(readValue());
     },
     [key, readValue]

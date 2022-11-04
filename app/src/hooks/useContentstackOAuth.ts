@@ -1,7 +1,5 @@
-import { OAuthCode, OAuthToken, getUserCode, setCode, setToken, useOAuth2Token } from "./oauth";
+import { getUserCode, useOAuth2Token } from "./oauth/useOAuth2Token";
 
-import { IBulkPublishingConfig } from "../types";
-import React from "react";
 import { useAppConfig } from "./useAppConfig";
 
 /**
@@ -10,34 +8,28 @@ import { useAppConfig } from "./useAppConfig";
  * @return {locationName, location}
  */
 
-interface IBulkPublishingUtils {
+interface IOAuthExampleUtils {
   oauthConfig: any;
   loadUserCode: getUserCode;
-  code: OAuthCode | undefined;
-  setCode: setCode;
-  token: OAuthToken | undefined;
-  setToken: setToken;
+  tokenIsActive: boolean;
+  tokenIsAvailable: boolean;
+  clearTokens: () => void;
 }
-export const useContentstackOAuth = (): IBulkPublishingUtils => {
+export const useContentstackOAuth = (): IOAuthExampleUtils => {
   const [extensionConfig] = useAppConfig();
 
-  // React.useEffect(() => {
-  //   console.log("🚀 ~ file: useContentstackOAuth.ts ~ useEffect", extensionConfig);
-  // }, [extensionConfig]);
-
-  const { token, setToken, getUserCode, code, setCode } = useOAuth2Token({
-    authorizeUrl: extensionConfig?.bulkPublishingConfig?.oauth?.authorizeUrl, //"https://app.contentstack.com/#!/apps/6336f43b57469b0019995038/authorize",
-    clientId: extensionConfig?.bulkPublishingConfig?.oauth?.clientId, //"Yo1twKPJ9uaQle-a",
-    responseType: extensionConfig?.bulkPublishingConfig?.oauth?.responseType, // "code",
-    redirectUri: extensionConfig?.bulkPublishingConfig?.oauth?.redirectUri, //"http://localhost:3000/callback",
+  const { tokenIsAvailable, getUserCode, tokenIsActive, clearTokens } = useOAuth2Token({
+    authorizeUrl: extensionConfig?.oAuthExampleConfig?.oauth?.authorizeUrl, //"https://app.contentstack.com/#!/apps/6336f43b57469b0019995038/authorize",
+    clientId: extensionConfig?.oAuthExampleConfig?.oauth?.clientId, //"Yo1twKPJ9uaQle-a",
+    responseType: extensionConfig?.oAuthExampleConfig?.oauth?.responseType, // "code",
+    redirectUri: extensionConfig?.oAuthExampleConfig?.oauth?.redirectUri, //"http://localhost:3000/callback",
   });
 
   return {
-    oauthConfig: extensionConfig?.bulkPublishingConfig?.oauth,
+    oauthConfig: extensionConfig?.oAuthExampleConfig?.oauth,
     loadUserCode: getUserCode,
-    code,
-    setCode,
-    token,
-    setToken,
+    tokenIsAvailable,
+    tokenIsActive,
+    clearTokens,
   };
 };

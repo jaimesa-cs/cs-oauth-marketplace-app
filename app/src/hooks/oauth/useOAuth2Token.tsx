@@ -9,6 +9,7 @@
 import * as PropTypes from "prop-types";
 import * as React from "react";
 
+import { INITIALIZE_SESSION_URL, VALIDATE_TOKEN_URL } from "./constants";
 import useLocalStorage, { SetValue } from "../useLocalStorage";
 
 import { Map } from "immutable";
@@ -99,11 +100,11 @@ export const useOAuth2Token = (options: Options): IOauth2TokenResult => {
     scope: options.scope,
     clientId: options.clientId,
   };
+  const [tokenIsActive, setTokenIsActive] = React.useState(false);
 
-  const [token, setToken] = useLocalStorage<string>(storageTokenPrefix + "-" + JSON.stringify(target), "");
-  const [code, setCode] = useLocalStorage<string>(storageCodePrefix + "-" + JSON.stringify(target), "");
-
-  let [state, setState] = useLocalStorage<string>(oauthStateName, "");
+  const [token, setToken] = useLocalStorage<string>(storageTokenPrefix + "-" + JSON.stringify(target));
+  const [code, setCode] = useLocalStorage<string>(storageCodePrefix + "-" + JSON.stringify(target));
+  let [state, setState] = useLocalStorage<string>(oauthStateName);
 
   const getUserCode = () => {
     setState(
@@ -116,12 +117,29 @@ export const useOAuth2Token = (options: Options): IOauth2TokenResult => {
 
     window.open(url);
   };
+
+  React.useEffect(() => {
+    if (token) {
+      axios
+        .get(VALIDATE_TOKEN_URL)
+        .then((res) => {
+          setTokenIsActive(res.data.active);
+        })
+        .catch((err) => {
+          setTokenIsActive(false);
+        });
+    }
+  }, [token]);
+
   return {
-    token,
-    setToken,
-    code,
-    setCode,
+    tokenIsActive,
+    tokenIsAvailable: !!token,
     getUserCode,
+    clearTokens: () => {
+      setCode(undefined);
+      setState(undefined);
+      setToken(undefined);
+    },
   };
 };
 
@@ -149,17 +167,6 @@ const OAuth2AuthorizeURL = (options: Options, state: string) => {
 };
 
 /**
- *
- * OAuthToken represents an OAuth2 implicit grant token.
- */
-export type OAuthToken = string;
-
-/**
- * OAuthToken represents an OAuth2 implicit grant token.
- */
-export type OAuthCode = string;
-
-/**
  * getToken is returned by [[useOAuth2Token]].
  * When called, it prompts the user to authorize.
  */
@@ -183,10 +190,9 @@ export type setCode = SetValue<string | undefined>;
 
 export interface IOauth2TokenResult {
   getUserCode: getUserCode;
-  setToken: setToken;
-  token: OAuthToken | undefined;
-  setCode: setCode;
-  code: OAuthCode | undefined;
+  tokenIsActive: boolean;
+  tokenIsAvailable: boolean;
+  clearTokens: () => void;
 }
 
 /**
@@ -247,19 +253,20 @@ const OAuthCallbackHandler: React.FunctionComponent<{ children: React.ReactNode 
     const code: string | undefined = params.get("code");
     if (code === undefined) throw ErrNoAccessToken;
     setCode(code);
-    axios("http://localhost:8080/api/initialize-session", {
+    axios(INITIALIZE_SESSION_URL, {
       method: "POST",
       data: {
         code: code,
-        userId: "jaime",
       },
     })
       .then((res) => {
+        console.log("🚀 ~ file: useOAuth2Token.tsx ~ line 264 ~ .then ~ res", res);
         setToken(res.data.access_token);
+
         window.close();
       })
       .catch((err) => {
-        console.log("🚀 ~ file: BulkPublishingSidebar.tsx ~ line 51 ~ BulkPublishingSidebarExtension ~ err", err);
+        console.log("🚀 ~ Error while initializing session", err);
       });
   }, [setToken, setCode, state]);
 

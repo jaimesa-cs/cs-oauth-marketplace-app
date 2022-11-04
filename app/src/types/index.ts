@@ -1,10 +1,10 @@
 import { IInstallationData } from "@contentstack/app-sdk/dist/src/types";
 
-export interface IBulkPublishingConfig extends KeyValueObj {}
+export interface IOAuthExampleConfig extends KeyValueObj {}
 
-export interface IBulkPublishingState {
+export interface IOAuthExampleState {
   name: string;
-  config?: IBulkPublishingConfig;
+  config?: IOAuthExampleConfig;
 }
 
 export interface KeyValueObj {

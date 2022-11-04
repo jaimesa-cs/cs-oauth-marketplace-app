@@ -21,7 +21,7 @@ export class CsWithOAuthService {
   };
   private async refreshToken(req: express.Request): Promise<IAccessTokenData | null> {
     try {
-      if (!req.session.userId || !req.session.tokenData?.access_token_data?.refresh_token) {
+      if (!req.session.tokenData?.access_token_data?.refresh_token) {
         return null;
       }
       const params = new URLSearchParams();
@@ -45,11 +45,11 @@ export class CsWithOAuthService {
   }
 
   public async initializeSession(req: express.Request, res: express.Response): Promise<void> {
+    let data = null;
     try {
-      const { code, userId } = req.body;
-      const data = await this.exchange(code);
+      const { code } = req.body;
+      data = await this.exchange(code);
       const token = data.access_token;
-      req.session.userId = userId;
       req.session.access_token = token;
       req.session.tokenData = {
         access_token_data: data,
@@ -58,7 +58,7 @@ export class CsWithOAuthService {
 
       res.json({ initialized: true, access_token: data.access_token });
     } catch (e) {
-      res.json({ initialized: false, access_token: undefined });
+      res.json({ initialized: false, access_token: "error", error: data });
     }
   }
 
@@ -69,7 +69,6 @@ export class CsWithOAuthService {
   public async tokenData(req: express.Request, res: express.Response): Promise<void> {
     req.session.views = (req.session.views || 0) + 1;
     res.json({
-      userId: req.session.userId,
       access_token: req.session.access_token,
       tokenData: req.session.tokenData,
       views: req.session.views,
@@ -78,7 +77,6 @@ export class CsWithOAuthService {
 
   private isActive(req: express.Request): boolean {
     if (
-      !req.session.userId ||
       !req.session.access_token ||
       !req.session.tokenData ||
       !req.session.tokenData.created_at ||
@@ -95,7 +93,7 @@ export class CsWithOAuthService {
   }
 
   public async contenstackApiProxy(req: express.Request, res: express.Response): Promise<void> {
-    if (!req.session.userId || !req.session.access_token) {
+    if (!req.session.access_token) {
       res.status(404).send("Access token has not been initialized!");
       return;
     }

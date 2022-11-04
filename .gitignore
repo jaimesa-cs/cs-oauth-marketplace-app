@@ -2,3 +2,4 @@
 dist
 build
 yarn-error.log
+app.config.json

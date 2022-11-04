@@ -53,7 +53,9 @@ export const MarketplaceAppProvider: React.FC<ProviderProps> = ({ children, igno
             .getConfig()
             .then((appConfig: KeyValueObj) => {
               setAppSdk(appSdk);
+              // console.log("🚀 ~ file: MarketplaceAppProvider.tsx ~ line 56 ~ .then ~ appSdk", appSdk);
               setConfig(appConfig);
+              // console.log("🚀 ~ file: MarketplaceAppProvider.tsx ~ line 57 ~ .then ~ appConfig", appConfig);
             })
             .catch(() => {
               setFailed(true);
