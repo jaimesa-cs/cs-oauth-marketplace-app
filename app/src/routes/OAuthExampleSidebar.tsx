@@ -6,7 +6,7 @@ import { useContentstackOAuth } from "../hooks/useContentstackOAuth";
 
 axios.defaults.withCredentials = true;
 
-const BulkPublishingSidebarExtension = () => {
+const OAuthExampleSidebarExtension = () => {
   const { loadUserCode, token, setToken, setCode } = useContentstackOAuth();
   const [apiStatus, setApiStatus] = React.useState<"success" | "fail" | "in-progress" | "none">("none");
 
@@ -125,4 +125,4 @@ const BulkPublishingSidebarExtension = () => {
   );
 };
 
-export default BulkPublishingSidebarExtension;
+export default OAuthExampleSidebarExtension;

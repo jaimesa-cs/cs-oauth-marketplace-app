@@ -12,7 +12,7 @@ import { OAuthCallback } from "./hooks/oauth";
  */
 const CustomFieldExtension = React.lazy(() => import("./routes/CustomField"));
 // const EntrySidebarExtension = React.lazy(() => import("./routes/EntrySidebar"));
-const BulkPublishingSidebarExtension = React.lazy(() => import("./routes/BulkPublishingSidebar"));
+const BulkPublishingSidebarExtension = React.lazy(() => import("./routes/OAuthExampleSidebar"));
 const AppConfigurationExtension = React.lazy(() => import("./routes/AppConfiguration"));
 const AssetSidebarExtension = React.lazy(() => import("./routes/AssetSidebar"));
 const StackDashboardExtension = React.lazy(() => import("./routes/StackDashboard"));
