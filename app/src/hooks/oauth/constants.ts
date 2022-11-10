@@ -1,3 +1,4 @@
-const HOST = "http://localhost:8080";
-export const VALIDATE_TOKEN_URL = `${HOST}/api/is-token-active`;
-export const INITIALIZE_SESSION_URL = `${HOST}/api/initialize-session`;
+export const HOST = "http://localhost:8080";
+export const CONTENTSTACK_HOST = "https://api.contentstack.io/";
+export const INITIALIZE_SESSION_URL = `/api/initialize-session`;
+export const REFRESH_TOKEN_URL = `/api/refresh-token`;

@@ -15,13 +15,14 @@ const MARKETPLACE_APP_NAME: string = process.env.REACT_APP_MARKETPLACE_APP_NAME 
 type ProviderProps = {
   children?: React.ReactNode;
   ignoreRoutes?: string[];
+  baseUrl?: string;
 };
 
 /**
  * Marketplace App Provider
  * @param children: React.ReactNode
  */
-export const MarketplaceAppProvider: React.FC<ProviderProps> = ({ children, ignoreRoutes }) => {
+export const MarketplaceAppProvider: React.FC<ProviderProps> = ({ children, ignoreRoutes, baseUrl }) => {
   const [failed, setFailed] = useState<boolean>(false);
   const [appSdk, setAppSdk] = useAppSdk();
   const [, setConfig] = useAppConfig();
@@ -45,8 +46,12 @@ export const MarketplaceAppProvider: React.FC<ProviderProps> = ({ children, igno
   // }, [setFailed, setAppSdk, setConfig, ignoreRoutes, location.pathname]);
 
   // Initialize the SDK and track analytics event
+  const routesWithBaseUrl = ignoreRoutes?.map((route) => {
+    return `${baseUrl !== undefined ? baseUrl : ""}${route}`;
+  });
+
   useEffect(() => {
-    if (ignoreRoutes === undefined || ignoreRoutes.indexOf(location.pathname) === -1) {
+    if (routesWithBaseUrl === undefined || !routesWithBaseUrl.includes(location.pathname)) {
       ContentstackAppSDK.init()
         .then((appSdk: Extension) => {
           appSdk
@@ -65,11 +70,12 @@ export const MarketplaceAppProvider: React.FC<ProviderProps> = ({ children, igno
           setFailed(true);
         });
     }
-  }, [setFailed, setAppSdk, setConfig, ignoreRoutes, location.pathname]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // wait until the SDK is initialized. This will ensure the values are set
   // correctly for appSdk atom.
-  if (ignoreRoutes && ignoreRoutes.includes(location.pathname)) {
+  if (routesWithBaseUrl && routesWithBaseUrl.includes(location.pathname)) {
     return <>{children}</>;
   }
 

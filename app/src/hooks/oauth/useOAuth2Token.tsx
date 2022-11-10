@@ -9,27 +9,10 @@
 import * as PropTypes from "prop-types";
 import * as React from "react";
 
-import { INITIALIZE_SESSION_URL, VALIDATE_TOKEN_URL } from "./constants";
-import useLocalStorage, { SetValue } from "../useLocalStorage";
-
+import { INITIALIZE_SESSION_URL } from "./constants";
 import { Map } from "immutable";
-import axios from "axios";
-
-// react-storage-hook.d.ts
-
-axios.defaults.withCredentials = true;
-
-/**
- * @hidden
- */
-const storagePrefix = "react-oauth2-hook";
-const storageCodePrefix = `${storagePrefix}-code`;
-const storageTokenPrefix = `${storagePrefix}-token`;
-
-/**
- * @hidden
- */
-const oauthStateName = `${storagePrefix}-state-token-challenge`;
+import axios from "../../api/axios";
+import useAuth from "./useAuth";
 
 export interface Options {
   /**
@@ -94,63 +77,22 @@ export interface Options {
  * @example
  
  */
-export const useOAuth2Token = (options: Options): IOauth2TokenResult => {
-  const target = {
-    authorizeUrl: options.authorizeUrl,
-    scope: options.scope,
-    clientId: options.clientId,
-  };
-  const [tokenIsActive, setTokenIsActive] = React.useState(false);
-
-  const [token, setToken] = useLocalStorage<string>(storageTokenPrefix + "-" + JSON.stringify(target));
-  const [code, setCode] = useLocalStorage<string>(storageCodePrefix + "-" + JSON.stringify(target));
-  let [state, setState] = useLocalStorage<string>(oauthStateName);
-
+export const useOAuth2Token = (options: Options): (() => void) => {
   const getUserCode = () => {
-    setState(
-      (state = JSON.stringify({
-        nonce: cryptoRandomString(),
-        target,
-      }))
-    );
-    const url = OAuth2AuthorizeURL(options, state);
-
+    const url = OAuth2AuthorizeURL(options);
     window.open(url);
   };
 
-  React.useEffect(() => {
-    if (token) {
-      axios
-        .get(VALIDATE_TOKEN_URL)
-        .then((res) => {
-          setTokenIsActive(res.data.active);
-        })
-        .catch((err) => {
-          setTokenIsActive(false);
-        });
-    }
-  }, [token]);
-
-  return {
-    tokenIsActive,
-    tokenIsAvailable: !!token,
-    getUserCode,
-    clearTokens: () => {
-      setCode(undefined);
-      setState(undefined);
-      setToken(undefined);
-    },
-  };
+  return getUserCode;
 };
 
 /**
  * @hidden
  */
-const OAuth2AuthorizeURL = (options: Options, state: string) => {
+const OAuth2AuthorizeURL = (options: Options) => {
   // console.log("OAuth2AuthorizeURL", options);
   const obj: any = {
     client_id: options.clientId,
-    state,
     redirect_uri: options.redirectUri,
     response_type: options.responseType,
   };
@@ -161,61 +103,10 @@ const OAuth2AuthorizeURL = (options: Options, state: string) => {
   const oAuthUrl = `${options.authorizeUrl}?${Object.entries<any>(obj)
     .map(([k, v]) => [k, v].map(encodeURIComponent).join("="))
     .join("&")}`;
-  // console.log("oAuthUrl", oAuthUrl);
   return oAuthUrl;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 };
 
-/**
- * getToken is returned by [[useOAuth2Token]].
- * When called, it prompts the user to authorize.
- */
-export type getUserCode = () => void;
-
-/**
- * setToken is returned by [[useOAuth2Token]].
- * When called, it overwrites any stored OAuth token.
- * `setToken(undefined)` can be used to synchronously
- * invalidate all instances of this OAuth token.
- */
-export type setToken = SetValue<string | undefined>;
-
-/**
- * setCode is returned by [[useOAuth2Token]].
- * When called, it overwrites any stored Code.
- * `setCode(undefined)` can be used to synchronously
- * invalidate all instances of this Code token.
- */
-export type setCode = SetValue<string | undefined>;
-
-export interface IOauth2TokenResult {
-  getUserCode: getUserCode;
-  tokenIsActive: boolean;
-  tokenIsAvailable: boolean;
-  clearTokens: () => void;
-}
-
-/**
- * @hidden
- */
-const cryptoRandomString = () => {
-  const entropy = new Uint32Array(10);
-  window.crypto.getRandomValues(entropy);
-
-  return window.btoa([...entropy].join(","));
-};
-
-/**
- * This error is thrown by the [[OAuthCallback]]
- * when the state token recieved is incorrect or does not exist.
- */
-export const ErrIncorrectStateToken = new Error("incorrect state token");
-
-/**
- * This error is thrown by the [[OAuthCallback]]
- * if no access_token is recieved.
- */
-export const ErrNoAccessToken = new Error("no access_token");
+export const ErrNoCode = new Error("no code available");
 
 /**
  * @hidden
@@ -234,12 +125,7 @@ const urlDecode = (urlString: string): Map<string, string> =>
  * @hidden
  */
 const OAuthCallbackHandler: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => {
-  const [state] = useLocalStorage<string | undefined>(oauthStateName);
-
-  const { target } = JSON.parse(state || "");
-
-  const [, /* token */ setToken] = useLocalStorage<string>(storageTokenPrefix + "-" + JSON.stringify(target));
-  const [, /* code */ setCode] = useLocalStorage<string>(storageCodePrefix + "-" + JSON.stringify(target));
+  const { setAuth } = useAuth();
 
   React.useEffect(() => {
     const params: Map<string, string> = Map([
@@ -251,8 +137,8 @@ const OAuthCallbackHandler: React.FunctionComponent<{ children: React.ReactNode 
     // if (state !== params.get("state")) throw ErrIncorrectStateToken;
 
     const code: string | undefined = params.get("code");
-    if (code === undefined) throw ErrNoAccessToken;
-    setCode(code);
+    if (code === undefined) throw ErrNoCode;
+
     axios(INITIALIZE_SESSION_URL, {
       method: "POST",
       data: {
@@ -260,15 +146,14 @@ const OAuthCallbackHandler: React.FunctionComponent<{ children: React.ReactNode 
       },
     })
       .then((res) => {
-        console.log("🚀 ~ file: useOAuth2Token.tsx ~ line 264 ~ .then ~ res", res);
-        setToken(res.data.access_token);
-
+        console.log("🚀 ~ file: useOAuth2Token.tsx ~ line 264 ~ .then ~ res", res.data);
+        setAuth(res.data);
         window.close();
       })
       .catch((err) => {
         console.log("🚀 ~ Error while initializing session", err);
       });
-  }, [setToken, setCode, state]);
+  }, [setAuth]);
 
   return <React.Fragment>{children || "please wait..."}</React.Fragment>;
 };

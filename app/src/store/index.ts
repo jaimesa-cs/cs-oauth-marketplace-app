@@ -1,4 +1,4 @@
-import { atom } from "jotai";
 import { KeyValueObj } from "../types";
+import { atom } from "jotai";
 
 export const appConfigAtom = atom<KeyValueObj>({});

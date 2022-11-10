@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useEventCallback, useEventListener } from "usehooks-ts";
 
+import { atom } from "jotai";
+
 declare global {
   interface WindowEventMap {
     "local-storage": CustomEvent;
@@ -55,7 +57,8 @@ function useLocalStorage<T>(key: string, initialValue?: T): [T | undefined, SetV
       setStoredValue(newValue);
 
       // We dispatch a custom event so every useLocalStorage hook are notified
-      window.dispatchEvent(new Event("local-storage"));
+
+      window.dispatchEvent(new StorageEvent("local-storage", { key: key }));
     } catch (error) {
       console.warn(`Error setting localStorage key “${key}”:`, error);
     }

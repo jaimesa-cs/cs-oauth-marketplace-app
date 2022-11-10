@@ -13,15 +13,22 @@ export class CsWithOAuthController {
     this.csWithOAuthService.initializeSession(req, res);
   }
 
-  public async isTokenActive(req: express.Request, res: express.Response): Promise<void> {
-    this.csWithOAuthService.isTokenActive(req, res);
-  }
-  public async contenstackApiProxy(req: express.Request, res: express.Response): Promise<void> {
-    this.csWithOAuthService.contenstackApiProxy(req, res);
+  public async refreshToken(req: express.Request, res: express.Response): Promise<void> {
+    this.csWithOAuthService.refreshToken(req, res);
   }
 
-  //!TODO: Remove in production
-  public async getTokens(req: express.Request, res: express.Response): Promise<void> {
-    this.csWithOAuthService.tokenData(req, res);
+  public async views(req: express.Request, res: express.Response): Promise<void> {
+    this.csWithOAuthService.views(req, res);
   }
+
+  // public async isTokenActive(req: express.Request, res: express.Response): Promise<void> {
+  //   this.csWithOAuthService.isTokenActive(req, res);
+  // }
+  // public async contenstackApiProxy(req: express.Request, res: express.Response): Promise<void> {
+  //   this.csWithOAuthService.contenstackApiProxy(req, res);
+  // }
+
+  // public async tokens(req: express.Request, res: express.Response): Promise<void> {
+  //   this.csWithOAuthService.tokens(req, res);
+  // }
 }

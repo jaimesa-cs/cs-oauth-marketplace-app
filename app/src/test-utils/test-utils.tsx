@@ -1,8 +1,8 @@
-import React from "react";
 import { Provider } from "jotai";
-import { render } from "@testing-library/react";
-import { appSdkRefAtom } from "../hooks/useAppSdk";
+import React from "react";
 import { appConfigAtom } from "../store";
+import { appSdkRefAtom } from "../hooks/useAppSdk";
+import { render } from "@testing-library/react";
 
 export const TestProvider = ({
   children,
@@ -19,7 +19,8 @@ export const TestProvider = ({
       initialValues={[
         [appSdkRefAtom, appSdk],
         [appConfigAtom, appConfig],
-      ]}>
+      ]}
+    >
       {children}
     </Provider>
   );

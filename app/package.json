@@ -5,6 +5,7 @@
   "files": [
     "dist"
   ],
+  "homepage": "/app/",
   "dependencies": {
     "@contentstack/app-sdk": "^1.1.1",
     "@contentstack/venus-components": "^1.0.4",
@@ -27,7 +28,7 @@
   },
   "scripts": {
     "prod": "yarn build && serve -s build",
-    "start": "react-scripts start",
+    "start": "PORT=3000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --verbose",
     "eject": "react-scripts eject",
