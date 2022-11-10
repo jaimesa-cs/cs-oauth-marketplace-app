@@ -5,7 +5,7 @@ import { useAppConfig } from "../../hooks/useAppConfig";
 import useAuth from "../../hooks/oauth/useAuth";
 import { useOAuth2Token } from "../../hooks/oauth/useOAuth2Token";
 
-const RequireAuth = () => {
+const RequireOAuthToken = () => {
   const [config] = useAppConfig();
   const loadUserCode = useOAuth2Token({
     authorizeUrl: config?.oAuthExampleConfig?.oauth?.authorizeUrl, //"https://app.contentstack.com/#!/apps/6336f43b57469b0019995038/authorize",
@@ -31,4 +31,4 @@ const RequireAuth = () => {
   );
 };
 
-export default RequireAuth;
+export default RequireOAuthToken;

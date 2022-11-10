@@ -6,8 +6,7 @@ import Layout from "./components/Layout";
 import { MarketplaceAppProvider } from "./MarketplaceAppProvider";
 import { OAuthCallback } from "./hooks/oauth/useOAuth2Token";
 import { Provider as OAuthExampleAppProvider } from "jotai";
-import RefreshToken from "./routes/oauth/RefreshToken";
-import RequireAuth from "./routes/oauth/RequireAuth";
+import RequireOAuthToken from "./routes/oauth/RequireOAuthToken";
 
 /**
  * All the routes are Lazy loaded.
@@ -35,17 +34,15 @@ function App() {
               }
             />
             <Route element={<Layout />}>
-              <Route element={<RefreshToken />}>
-                <Route element={<RequireAuth />}>
-                  <Route
-                    path={`/${baseUrl}/oauth-example`}
-                    element={
-                      <Suspense>
-                        <OAuthExampleSidebarExtension />
-                      </Suspense>
-                    }
-                  />
-                </Route>
+              <Route element={<RequireOAuthToken />}>
+                <Route
+                  path={`/${baseUrl}/oauth-example`}
+                  element={
+                    <Suspense>
+                      <OAuthExampleSidebarExtension />
+                    </Suspense>
+                  }
+                />
               </Route>
             </Route>
           </Routes>
