@@ -1,6 +1,5 @@
-import { IAccessTokenData, ITokensDictionary, IUserTokenData } from "index";
-import axios, { AxiosRequestConfig } from "axios";
-import express, { response } from "express";
+import axios from "axios";
+import express from "express";
 
 require("dotenv").config();
 
@@ -27,13 +26,7 @@ export class CsWithOAuthService {
     }
   }
 
-  public async views(req: express.Request, res: express.Response): Promise<void> {
-    const views = (req.session.views || 0) + 1;
-    req.session.views = views;
-
-    res.json({ views });
-  }
-  public async initializeSession(req: express.Request, res: express.Response): Promise<void> {
+  public async exchangeCode(req: express.Request, res: express.Response): Promise<void> {
     let data = null;
     try {
       const { code } = req.body;
@@ -45,7 +38,7 @@ export class CsWithOAuthService {
     }
   }
 
-  private async exchange(code: string): Promise<IAccessTokenData> {
+  private async exchange(code: string): Promise<any> {
     const params = new URLSearchParams();
     params.append("grant_type", "authorization_code");
     params.append("client_id", process.env.CS_CLIENT_ID || "");

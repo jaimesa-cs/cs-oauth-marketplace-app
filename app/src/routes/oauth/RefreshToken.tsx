@@ -6,7 +6,7 @@ import useRefresh from "../../hooks/oauth/useRefreshToken";
 
 const RefreshToken = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { refreshCallback } = useRefresh();
+  const { asyncRefresh } = useRefresh();
   const { canRefresh } = useAuth();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const RefreshToken = () => {
 
     const verifyRefreshToken = async () => {
       try {
-        refreshCallback();
+        asyncRefresh();
       } catch (err) {
         console.error(err);
       } finally {

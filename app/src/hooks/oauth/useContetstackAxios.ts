@@ -1,9 +1,16 @@
 import { contentstackAxios as axios } from "../../api/axios";
+import { useAppConfig } from "../useAppConfig";
 import useAuth from "./useAuth";
 import { useEffect } from "react";
 import useRefresh from "./useRefreshToken";
 
 const useContenstackAxios = () => {
+  const [
+    {
+      oAuthExampleConfig: { apiKey },
+    },
+  ] = useAppConfig();
+
   const { auth, setAuth } = useAuth();
   const { syncRefresh } = useRefresh();
 
@@ -15,11 +22,9 @@ const useContenstackAxios = () => {
             config.headers["authorization"] = `Bearer ${auth?.access_token}`;
           }
           if (!config.headers["api_key"]) {
-            //! TODO: Retrieve from config
-            config.headers["api_key"] = ``;
+            config.headers["api_key"] = apiKey;
           }
         }
-        console.log("Request Interceptor", config);
         return config;
       },
       (error) => Promise.reject(error)

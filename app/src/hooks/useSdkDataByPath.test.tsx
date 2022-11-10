@@ -1,7 +1,6 @@
 import React from "react";
-import { renderHook } from "@testing-library/react";
 import { TestProvider } from "../test-utils/test-utils";
-import { useAppConfig } from "./useAppConfig";
+import { renderHook } from "@testing-library/react";
 import { useSdkDataByPath } from "./useSdkDataByPath";
 
 describe("useSdkDataByPath", () => {

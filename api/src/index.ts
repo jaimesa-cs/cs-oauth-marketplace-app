@@ -3,7 +3,7 @@ import "module-alias/register";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
-import { csWithOauthRouter } from "./controllers/cs-with-oauth";
+import { csWithOauthRouter } from "./controllers/cs-oauth";
 import express from "express";
 import http from "http";
 import { logger } from "./middleware/logEvents";

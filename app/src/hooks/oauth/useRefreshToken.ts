@@ -6,7 +6,7 @@ import useAuth from "./useAuth";
 export default function useRefresh() {
   const { auth, setAuth, isValid, canRefresh } = useAuth();
 
-  const refreshCallback = React.useCallback(() => {
+  const asyncRefresh = React.useCallback(() => {
     if (canRefresh) {
       axios
         .post(REFRESH_TOKEN_URL, {
@@ -22,14 +22,14 @@ export default function useRefresh() {
     }
   }, [auth?.refresh_token, canRefresh, setAuth]);
 
-  const syncRefresh = async () => {
+  const syncRefresh = React.useCallback(async () => {
     if (canRefresh) {
       const response = await axios.post(REFRESH_TOKEN_URL, {
         refreshToken: auth?.refresh_token,
       });
       return response.data;
     }
-  };
+  }, [auth?.refresh_token, canRefresh]);
 
-  return { refreshCallback, syncRefresh, needsRefreshing: auth && auth.refresh_token && !isValid };
+  return { asyncRefresh, syncRefresh, needsRefreshing: auth && auth.refresh_token && !isValid };
 }

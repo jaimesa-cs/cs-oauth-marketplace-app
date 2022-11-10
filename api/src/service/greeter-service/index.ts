@@ -1,1 +1,0 @@
-export { GreeterService } from './greeter-service';

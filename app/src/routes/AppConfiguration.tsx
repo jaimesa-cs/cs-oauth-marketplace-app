@@ -5,7 +5,6 @@ import { showError, showSuccess } from "../utils/notifications";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import Icon from "../images/appconfig.svg";
 import React from "react";
-import { useAppConfig } from "../hooks/useAppConfig";
 import { useAppSdk } from "../hooks/useAppSdk";
 import utils from "../utils";
 
@@ -17,9 +16,7 @@ const isValidJson = (json: any) => {
   }
   return true;
 };
-const json: IOAuthExampleConfig = {
-  name: "App Configuration New",
-};
+
 const AppConfigurationExtension = () => {
   const [sdk] = useAppSdk();
   const [state, setState] = React.useState<TypeAppSdkConfigState & { oAuthExampleConfig: IOAuthExampleConfig }>({
@@ -29,7 +26,7 @@ const AppConfigurationExtension = () => {
     },
     setInstallationData: (): any => {},
     appSdkInitialized: false,
-    oAuthExampleConfig: json,
+    oAuthExampleConfig: {},
   });
 
   /** updateConfig - Function where you should update the state variable
@@ -69,6 +66,10 @@ const AppConfigurationExtension = () => {
     if (sdkConfigData) {
       sdkConfigData.getInstallationData().then((installationDataFromSDK) => {
         const setInstallationDataOfSDK = sdkConfigData.setInstallationData;
+        console.log(
+          "🚀 ~ file: AppConfiguration.tsx  line 75 ~ sdkConfigData.getInstallationData ~ setInstallationDataOfSDK",
+          installationDataFromSDK.configuration.oAuthExampleConfig
+        );
 
         setState(() => {
           setLoading(false);
@@ -77,7 +78,7 @@ const AppConfigurationExtension = () => {
             installationData: utils.mergeObjects(state.installationData, installationDataFromSDK),
             setInstallationData: setInstallationDataOfSDK,
             appSdkInitialized: true,
-            oauthExampleConfig: installationDataFromSDK.configuration.oauthExampleConfig,
+            oAuthExampleConfig: installationDataFromSDK.configuration.oAuthExampleConfig,
           };
         });
       });
@@ -95,7 +96,7 @@ const AppConfigurationExtension = () => {
         </div>
         <div className="app-component-content">
           <FieldLabel required htmlFor="advancedPublishingConfig" error={!isValid}>
-            JSON Configuration
+            JSON Configuration 2
           </FieldLabel>
 
           {loading ? (

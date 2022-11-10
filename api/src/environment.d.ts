@@ -5,7 +5,6 @@ declare global {
       CS_CM_TOKEN: string;
       CS_API_KEY: string;
       CS_API_HOST: string;
-      SESSION_SECRET: string;
     }
   }
 }

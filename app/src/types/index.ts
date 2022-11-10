@@ -2,11 +2,6 @@ import { IInstallationData } from "@contentstack/app-sdk/dist/src/types";
 
 export interface IOAuthExampleConfig extends KeyValueObj {}
 
-export interface IOAuthExampleState {
-  name: string;
-  config?: IOAuthExampleConfig;
-}
-
 export interface KeyValueObj {
   [key: string]: any;
 }

@@ -1,11 +1,11 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
-import { Provider as BulkPublishingProvider } from "jotai";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import Layout from "./routes/Layout";
+import Layout from "./components/Layout";
 import { MarketplaceAppProvider } from "./MarketplaceAppProvider";
 import { OAuthCallback } from "./hooks/oauth/useOAuth2Token";
+import { Provider as OAuthExampleAppProvider } from "jotai";
 import RefreshToken from "./routes/oauth/RefreshToken";
 import RequireAuth from "./routes/oauth/RequireAuth";
 
@@ -21,7 +21,7 @@ const baseUrl = "";
 function App() {
   return (
     <ErrorBoundary>
-      <BulkPublishingProvider>
+      <OAuthExampleAppProvider>
         <MarketplaceAppProvider ignoreRoutes={["/callback", "/ping"]} baseUrl={baseUrl}>
           <Routes>
             <Route path={`${baseUrl}`} element={<div>Nothing to show here</div>} />
@@ -50,7 +50,7 @@ function App() {
             </Route>
           </Routes>
         </MarketplaceAppProvider>
-      </BulkPublishingProvider>
+      </OAuthExampleAppProvider>
     </ErrorBoundary>
   );
 }

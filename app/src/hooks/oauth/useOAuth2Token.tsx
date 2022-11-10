@@ -1,83 +1,22 @@
-/**
- * @module react-oauth2-hook
- */
-
-/**
- *
- */
-
 import * as PropTypes from "prop-types";
 import * as React from "react";
 
-import { INITIALIZE_SESSION_URL } from "./constants";
+import { EXCHANGE_CODE_URL } from "./constants";
 import { Map } from "immutable";
 import axios from "../../api/axios";
 import useAuth from "./useAuth";
 
-export interface Options {
-  /**
-   * The OAuth authorize URL to retrieve the token from.
-   */
+export interface IOAuthParameters {
   authorizeUrl: string;
-  /**
-   * The OAuth scopes to request.
-   */
   scope?: string[];
-  /**
-   * The OAuth `redirect_uri` callback.
-   */
   redirectUri: string;
-  /**
-   * The OAuth `client_id` corresponding to the requesting client.
-   */
   clientId: string;
-  /**
-   * The OAuth `response_type` corresponding to the requesting client.
-   */
   responseType?: string;
-  /**
-   * The  `fromUrl` that we will need to redirect to after authorization.
-   */
+
   fromUrl?: string;
 }
 
-/**
- * useOAuth2Token is a React hook providing an OAuth2 implicit grant token.
- *
- * When useToken is called, it will attempt to retrieve an existing
- * token by the criteria of `{ authorizeUrl, scopes, clientID }`.
- * If a token by these specifications does not exist, the first
- * item in the returned array will be `undefined`.
- *
- * If the user wishes to retrieve a new token, they can call `getToken()`,
- * a function returned by the second parameter. When called, the function
- * will open a window for the user to confirm the OAuth grant, and
- * pass it back as expected via the hook.
- *
- * The OAuth token must be passed to a static endpoint. As
- * such, the `callbackUrl` must be passed with this endpoint.
- * The `callbackUrl` should render the [[OAuthCallback]] component,
- * which will securely verify the token and pass it back,
- * before closing the window.
- *
- * All instances of this hook requesting the same token and scopes
- * from the same place are synchronized. In concrete terms,
- * if you have many components waiting for a Facebook OAuth token
- * to make a call, they will all immediately update when any component
- * gets a token.
- *
- * Finally, in advanced cases the user can manually overwrite any
- * stored token by capturing and calling the third item in
- * the reponse array with the new value.
- *
- * @param authorizeUrl The OAuth authorize URL to retrieve the token from.
- * @param scope The OAuth scopes to request.
- * @param redirectUri The OAuth redirect_uri callback URL.
- * @param clientId The OAuth client_id corresponding to the requesting client.
- * @example
- 
- */
-export const useOAuth2Token = (options: Options): (() => void) => {
+export const useOAuth2Token = (options: IOAuthParameters): (() => void) => {
   const getUserCode = () => {
     const url = OAuth2AuthorizeURL(options);
     window.open(url);
@@ -89,7 +28,7 @@ export const useOAuth2Token = (options: Options): (() => void) => {
 /**
  * @hidden
  */
-const OAuth2AuthorizeURL = (options: Options) => {
+const OAuth2AuthorizeURL = (options: IOAuthParameters) => {
   // console.log("OAuth2AuthorizeURL", options);
   const obj: any = {
     client_id: options.clientId,
@@ -139,7 +78,7 @@ const OAuthCallbackHandler: React.FunctionComponent<{ children: React.ReactNode 
     const code: string | undefined = params.get("code");
     if (code === undefined) throw ErrNoCode;
 
-    axios(INITIALIZE_SESSION_URL, {
+    axios(EXCHANGE_CODE_URL, {
       method: "POST",
       data: {
         code: code,
