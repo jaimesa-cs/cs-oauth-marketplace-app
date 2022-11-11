@@ -22,7 +22,7 @@ export class CsWithOAuthService {
       res.json({ ...response.data, expires_at: now + response.data.expires_in * 1000 });
     } catch (e: any) {
       console.log("Error", e.response.data);
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(403).json({ error: "Unauthorized" });
     }
   }
 
