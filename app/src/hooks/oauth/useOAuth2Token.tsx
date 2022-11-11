@@ -155,6 +155,3 @@ class ClosingErrorBoundary extends React.PureComponent<{ children: React.ReactNo
     return this.state.errored ? null : this.props.children;
   }
 }
-
-const defaultExportsMessage = "this module has no default export.";
-export default defaultExportsMessage;
