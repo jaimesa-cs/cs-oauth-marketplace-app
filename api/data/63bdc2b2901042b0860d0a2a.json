@@ -1,0 +1,12 @@
+{
+  "access_token": "30af4297490a91a48c0c8f3c12878c36",
+  "refresh_token": "800e9bcbe3377f2ddc7379311da64f93",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "location": "NA",
+  "organization_uid": "blt69be4afa58c24727",
+  "authorization_type": "app",
+  "user_uid": "",
+  "stack_api_key": "blt3501488d42aebb6d",
+  "expires_at": 1673384132801
+}
